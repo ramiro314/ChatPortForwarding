@@ -17,8 +17,7 @@
 #define BUFSIZE 2048
 
 int main(int argc, const char * argv[]) {
-    struct sockaddr_in my_addres;
-    struct sockaddr_in remote_address;
+    struct sockaddr_in my_address, remote_address;
     socklen_t addresses_len = sizeof(remote_address);
     int recvlen;			/* # bytes received */
     int msg_cnt = 0;
@@ -30,12 +29,12 @@ int main(int argc, const char * argv[]) {
         return 0;
     }
     
-    memset((char *)&my_addres, 0, sizeof(my_addres));
-    my_addres.sin_family = AF_INET;
-    my_addres.sin_addr.s_addr = htonl(INADDR_ANY);
-    my_addres.sin_port = htons(SERVICE_PORT);
+    memset((char *)&my_address, 0, sizeof(my_address));
+    my_address.sin_family = AF_INET;
+    my_address.sin_addr.s_addr = htonl(INADDR_ANY);
+    my_address.sin_port = htons(SERVICE_PORT);
     
-    if (bind(fd, (struct sockaddr *)&my_addres, sizeof(my_addres)) < 0) {
+    if (bind(fd, (struct sockaddr *)&my_address, sizeof(my_address)) < 0) {
         perror("bind failed\n");
         return 0;
     }
