@@ -6,6 +6,7 @@
 //  Copyright © 2015 Ramiro Meares. All rights reserved.
 //
 
+#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,7 +22,7 @@
 int main(void)
 {
     struct sockaddr_in my_address, remote_address;
-    int fd, i, slen=sizeof(remote_address);
+    int fd, i;
     socklen_t addresses_len = sizeof(remote_address);
     char buf[BUFLEN];
     int recvlen;
@@ -60,7 +61,7 @@ int main(void)
     
     for (i=0; i < MSGS; i++) {
         printf("Sending packet %d to %s port %d\n", i, server, SERVICE_PORT);
-        sprintf(buf, "This is packet %d", i);
+        std::cin >> buf;
         if (sendto(fd, buf, strlen(buf), 0, (struct sockaddr *)&remote_address, addresses_len)==-1) {
             perror("sendto");
             exit(1);
