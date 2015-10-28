@@ -39,26 +39,32 @@ int main(int argc, const char * argv[]) {
     socklen_t addresses_len = sizeof(remote_address);
     int socket_descriptor;
     int service_port;
-    char *server;
+    char *server = nullptr;
     bool is_server;
+    char buf[BUFSIZE];      /* send buffer */
     
-    if (argc < 1) {
+    int i;
+    for (i = 0; i < argc; i++)
+        printf("Param %d: %s\n", i, argv[i]);
+    
+    /* Set default values and identify if we are server */
+    if (argc < 2) {
         service_port = SERVICE_PORT;
         is_server = true;
-    } else if (argc < 2) {
-        service_port = atoi(argv[0]);
+    } else if (argc < 3) {
+        service_port = atoi(argv[1]);
         is_server = true;
     } else {
-        service_port = atoi(argv[0]);
-        strcpy(server, argv[1]);
+        service_port = atoi(argv[1]);
+        server = (char*)argv[2];
         is_server = false;
     }
     
+    /* Create socket */
     if ((socket_descriptor = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         perror("ERROR: Cannot create socket\n");
         return 0;
     }
-    
     memset((char *)&my_address, 0, sizeof(my_address));
     my_address.sin_family = AF_INET;
     my_address.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -68,12 +74,13 @@ int main(int argc, const char * argv[]) {
         my_address.sin_port = htons(0);
     }
 
-
+    /* Bind socket */
     if (bind(socket_descriptor, (struct sockaddr *)&my_address, sizeof(my_address)) < 0) {
         perror("ERROR: Bind failed\n");
         return 0;
     }
     
+    /* If we are client, connect to server */
     if (!is_server){
         memset((char *) &remote_address, 0, sizeof(remote_address));
         remote_address.sin_family = AF_INET;
@@ -82,17 +89,21 @@ int main(int argc, const char * argv[]) {
             perror("ERROR: inet_aton() failed\n");
             return 0;
         }
+        /* Make first call to the server */
+        if (sendto(socket_descriptor, buf, strlen(buf), 0, (struct sockaddr *)&remote_address, addresses_len) < 0)
+            perror("ERROR: sendto() failed\n");
         printf("Conntected to server %s in port %d\n", server, service_port);
     }else{
-        printf("Created server in port %d\n", service_port);        
+        printf("Created server in port %d\nWaiting for connection\n", service_port);
+        recvfrom(socket_descriptor, buf, BUFSIZE, 0, (struct sockaddr *)&remote_address, &addresses_len);
+        printf("Connected with client\n");
     }
     
+    /* Initiate message reciever thread */
     std::thread t1(recieve_messages, socket_descriptor, remote_address, addresses_len);
     
-    char buf[BUFSIZE];      /* send buffer */
     for (;;) {
         std::cin >> buf;
-        printf("Me: %s\n", buf);
         if (sendto(socket_descriptor, buf, strlen(buf), 0, (struct sockaddr *)&remote_address, addresses_len) < 0)
             perror("ERROR: sendto() failed\n");
         
