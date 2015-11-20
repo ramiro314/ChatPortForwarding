@@ -65,8 +65,6 @@ int main(int argc, const char * argv[]) {
     socklen_t addresses_len = sizeof(socket1);
     int socket_descriptor1, socket_descriptor2;
 
-    /* Socket has been created and connected to the other party */
-
     /* SOCKET 1 */
     /* Create socket */
     if ((socket_descriptor1 = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
@@ -101,7 +99,6 @@ int main(int argc, const char * argv[]) {
         perror("ERROR: Bind failed\n");
         return 0;
     }
-    
     
     /* Forward one way */
     std::thread t1(forward_data, socket_descriptor2, socket_descriptor1, socket1, socket2, addresses_len);

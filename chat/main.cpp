@@ -16,7 +16,7 @@
 #include <thread>
 
 #define BUFSIZE 2048
-#define SERVICE_PORT    21234
+#define SERVICE_PORT    21200
 
 
 void recieve_messages(int socket_descriptor, sockaddr_in remote_address, socklen_t addresses_len){
