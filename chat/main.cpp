@@ -81,6 +81,7 @@ int main(int argc, const char * argv[]) {
     }
     
     /* If we are client, connect to server */
+    sprintf(buf, "Connecting...");
     if (!is_server){
         memset((char *) &remote_address, 0, sizeof(remote_address));
         remote_address.sin_family = AF_INET;
